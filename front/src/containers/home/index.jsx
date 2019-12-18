@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
-
+import Intro from '../../components/intro';
 
 class Index extends Component {
     render () {
         return (
-            <div>
-                <h1>On est sur la Home</h1>
-            </div>
+            <Intro />
         )
     }
 }
