@@ -1,28 +1,45 @@
+require('dotenv').config()
 const express = require('express')
+const bodyParser = require('body-parser');
+const nodemailer = require('nodemailer');
+const cors = require('cors');
 const app = express();
-//Load HTTP module
-const http = require("http");
-const hostname = '127.0.0.1';
-const port = 3000;
+const { htmlEmail } = require('./tools/htmlEmail');
 
-//Create HTTP server and listen on port 3000 for requests
-const server = http.createServer((req, res) => {
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
-    //Set the response HTTP header with HTTP status and Content type
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/plain');
-    res.end('Hello World\n');
+app.use(cors());
+
+app.post('/', (req, res) => {
+    console.log(req.body);
+    nodemailer.createTestAccount((err, account) => {
+        let transporter = nodemailer.createTransport({
+            host: process.env.SMTP_GMAIL,
+            port: 465,
+            secure: true,
+            auth: {
+                user: process.env.MAIL_ADRESS,
+                pass: process.env.PASSWORD
+            }
+        });
+
+        let mailOptions = {
+            from: process.env.MAIL_ADRESS,
+            to: process.env.MAIL_ADRESS,
+            subject: 'Prise de contact',
+            text: req.body.message,
+            html: htmlEmail(req.body)
+        }
+        transporter.sendMail(mailOptions, (err, info) => {
+            if (err) return console.log(err);
+            else console.log('---------- Email Send ----------');
+        })
+    })
 });
 
-//listen for request on port 3000, and as a callback function have the port listened on logged
-server.listen(port, hostname, () => {
-    console.log(`Server running at http://${hostname}:${port}/`);
-});
+const PORT = process.env.PORT || 3002;
 
-app.get('/', (req, res) => {
-    res.send('Hello World!')
-});
-
-app.listen(8000, () => {
-    console.log('Example app listening on port 8000!')
+app.listen(PORT, () => {
+    console.log(`Server listening on Port: ${PORT}`);
 });

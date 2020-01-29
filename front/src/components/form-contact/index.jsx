@@ -1,17 +1,47 @@
-import React, { Component } from 'react';
-import { axios } from 'axios';
+import React, {Component, useState} from 'react';
+const axios = require('axios');
 
 export default function FormContact() {
 
-    const onSubmit = (data, e) => {
-        e.target.reset();
+    const [formValue, setFormValue] = useState({
+       name :'',
+       email: '',
+       message: ''
+    });
+
+    const resetFormData = () => {
+        setFormValue({
+            name :'',
+            email: '',
+            message: ''
+        })
     };
 
-    const handleSubmit = (evt) => {
-        evt.preventDefault();
+    const updateFormData = event =>
+        setFormValue({
+            ...formValue,
+            [event.target.name]: event.target.value
+        });
 
+    const { name, email, message } = formValue;
 
+    const onSubmit = (event) => {
+        event.preventDefault();
+
+        axios.post('http://localhost:3001/', {
+            name,
+            email,
+            message
+        }).then(function (response) {
+            console.log('Request done for sending mail', response);
+        }).catch(function (error) {
+            console.log('error');
+            console.log(error);
+        });
+        resetFormData();
+        alert('Email envoyé !');
     };
+
 
         return (
             <div id="contact" className={"container-fluid position-relative h-100"}>
@@ -37,6 +67,9 @@ export default function FormContact() {
                                                 type="text"
                                                 className={"form-control form-control-lg"}
                                                 placeholder="Quel est votre nom ?"
+                                                value={name}
+                                                name='name'
+                                                onChange={e => updateFormData(e)}
                                             />
                                         </div>
                                     </div>
@@ -48,6 +81,9 @@ export default function FormContact() {
                                                 type="text"
                                                 className={"form-control form-control-lg"}
                                                 placeholder="Quel est votre adresse mail ?"
+                                                value={email}
+                                                onChange={e => updateFormData(e)}
+                                                name='email'
                                             />
                                         </div>
                                     </div>
@@ -62,11 +98,14 @@ export default function FormContact() {
                                                 id="message"
                                                 rows="3"
                                                 placeholder="Your message"
+                                                value={message}
+                                                onChange={e => updateFormData(e)}
+                                                name='message'
                                             ></textarea>
                                         </div>
                                     </div>
                                 </div>
-                                <input type='submit' value='Valider' />
+                                <input type='submit' onClick={onSubmit} value='Valider' />
                                 <input
                                     style={{ display: "block", marginTop: 10 }}
                                     type="reset"
