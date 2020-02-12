@@ -110,12 +110,12 @@ canvas {
 
 /* ---- particles.js container ---- */
 
-.particles-js {
+/*.particles-js {
     position: absolute;
     width: 100%;
     /* width: 100vw; */
-    height: 100%;
-}
+   /* height: 100%;
+}*/
 
 #home,
 #vr-games,
